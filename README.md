@@ -176,4 +176,4 @@ export default App;
 
 
 
-    After you call the above function, this, the app will navigate to the checkout screen 
+After you call the above function, this, the app will navigate to the checkout screen 
