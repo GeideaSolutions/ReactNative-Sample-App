@@ -43,7 +43,7 @@ class CheckoutLogic extends Component {
     this.props.navigation.pop(1)
   }
   _handlePaymentRequest() {
-    const { amount, currency, callbackUrl, publicKey, apiPassword } =
+    const { amount, currency, callbackUrl, publicKey, apiPassword, paymentOperation } =
       this.type === 'modal' ? this.props : this.myProps
     this.setState({ loading: true })
     this._initiateAuthentication(
@@ -68,7 +68,8 @@ class CheckoutLogic extends Component {
           returnUrl,
           this.state.rememberMe,
           publicKey,
-          apiPassword
+          apiPassword,
+          paymentOperation
         )
           .then((payerAuthenticationResponse) => {
             //console.log(payerAuthenticationResponse)
@@ -134,7 +135,8 @@ class CheckoutLogic extends Component {
     returnUrl,
     cardOnFile,
     publicKey,
-    apiPassword
+    apiPassword,
+    paymentOperation
   ) {
     let expireDate = this.state.creditCardFormData.expiry.replace(/\s+/g, '')
     var monthYear = expireDate.split('/')
@@ -154,6 +156,7 @@ class CheckoutLogic extends Component {
         callbackUrl: callbackUrl,
         returnUrl: returnUrl,
         cardOnFile: cardOnFile,
+        paymentOperation: paymentOperation,
       }
     )
     console.log(payerAuthenticationRequestBody.paramsMap())
