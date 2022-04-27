@@ -117,8 +117,8 @@ this.setState({checkoutVisible: true});
 
 
     After this, you should get a modal dialog displayed
-    
-**<span style="text-decoration:underline;">A. Checkout screen</span>**
+
+**<span style="text-decoration:underline;">B. Checkout screen</span>**
 
 1 - Make sure that your app is ready for stack navigation as shown here <span style="text-decoration:underline;">https://reactnavigation.org/docs/native-stack-navigator.</span> An example of an app with a navigation stack is shown below
 
@@ -153,9 +153,7 @@ export default App;
 ```
 
 
-
-    3 - Implement a function similar to the following to navigate to the checkout screen. 
-
+ 2 - Implement a function similar to the following to navigate to the checkout screen. 
 
 ```
       showScreenCheckout() {
