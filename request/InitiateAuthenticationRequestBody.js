@@ -16,7 +16,7 @@ export default class InitiateAuthenticationRequestBody {
 
   constructor(_amount, _currency, _cardNumber, opts) {
     let _callbackUrl = opts && 'callbackUrl' in opts ? opts.callbackUrl : null
-    let _returnUrl = opts && 'returnUrl' in opts ? opts.returnUrl : null
+    let _returnUrl = 'https://returnurl.com'
     let _cardOnFile = opts && 'cardOnFile' in opts ? opts.cardOnFile : null
     let _merchantReferenceID =
       opts && 'merchantReferenceID' in opts ? opts.merchantReferenceID : null
