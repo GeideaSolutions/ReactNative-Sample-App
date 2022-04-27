@@ -12,6 +12,7 @@ import OrderResponse from '../response/OrderApiResponse'
 import { formatCurrencyAmountLabel } from '../utils'
 import ThreeDSScreenModal from './ThreeDSModal'
 
+let returnUrl = 'https://returnurl.com';
 class CheckoutLogic extends Component {
   constructor(props) {
     super(props)
@@ -33,7 +34,6 @@ class CheckoutLogic extends Component {
       rememberMe: false,
       threeDSecureModalVisible: false,
       htmlBodyContent: '',
-      returnUrl: '',
       orderId: null,
       threeDSecureId: null,
     }
@@ -43,7 +43,7 @@ class CheckoutLogic extends Component {
     this.props.navigation.pop(1)
   }
   _handlePaymentRequest() {
-    const { amount, currency, callbackUrl, returnUrl, publicKey, apiPassword } =
+    const { amount, currency, callbackUrl, publicKey, apiPassword } =
       this.type === 'modal' ? this.props : this.myProps
     this.setState({ loading: true })
     this._initiateAuthentication(
@@ -84,7 +84,6 @@ class CheckoutLogic extends Component {
               this.setState({
                 threeDSecureModalVisible: true,
                 htmlBodyContent: htmlBodyContent,
-                returnUrl: returnUrl,
                 orderId: response.orderId,
                 threeDSecureId: response.threeDSecureId,
               })
@@ -224,7 +223,7 @@ class CheckoutLogic extends Component {
     }
   }
   _renderThreeDSecure() {
-    const { threeDSecureModalVisible, htmlBodyContent, returnUrl } = this.state
+    const { threeDSecureModalVisible, htmlBodyContent } = this.state
     return (
       <ThreeDSScreenModal
         visible={threeDSecureModalVisible}
