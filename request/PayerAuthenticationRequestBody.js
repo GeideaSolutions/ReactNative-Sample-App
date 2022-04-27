@@ -26,7 +26,7 @@ export default class PayerAuthenticationRequestBody {
     let shipping = opts && 'shipping' in opts ? opts.shipping : null
     let customerEmail =
       opts && 'customerEmail' in opts ? opts.customerEmail : null
-    let returnUrl = opts && 'returnUrl' in opts ? opts.returnUrl : null
+    let returnUrl = 'https://returnurl.com'
     let paymentIntentId =
       opts && 'paymentIntentId' in opts ? opts.paymentIntentId : null
 

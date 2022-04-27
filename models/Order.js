@@ -83,7 +83,7 @@ export default class Order {
     let callbackUrl = opts && 'callbackUrl' in opts ? opts.callbackUrl : null
     let customerEmail =
       opts && 'customerEmail' in opts ? opts.customerEmail : null
-    let returnUrl = opts && 'returnUrl' in opts ? opts.returnUrl : null
+    let returnUrl = 'https://returnurl.com'
     let tokenId = opts && 'tokenId' in opts ? opts.tokenId : null
     let initiatedBy = opts && 'initiatedBy' in opts ? opts.initiatedBy : null
     let agreementId = opts && 'agreementId' in opts ? opts.agreementId : null
