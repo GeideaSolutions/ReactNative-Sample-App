@@ -7,7 +7,7 @@ const Button = ({ onPress, labelText, loading, buttonTextStyle, buttonStyle, und
   const { button, buttonText } = styles;
   return (
     <TouchableHighlight 
-      style={[button, buttonStyle]} 
+      style={[button, buttonStyle, {marginTop: 20}]} 
       onPress={onPress}
       underlayColor={underlayColor}>
       <Text style={[buttonText, buttonTextStyle]}>

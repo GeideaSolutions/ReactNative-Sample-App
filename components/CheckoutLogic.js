@@ -16,17 +16,28 @@ let returnUrl = 'https://returnurl.com';
 class CheckoutLogic extends Component {
   constructor(props) {
     super(props)
-    this.state = this._calculateState()
+    this.state = this._calculateState(props)
     this.type = 'modal'
     if (props.route != null && props.route.params != null) {
       this.type = 'screen'
       this.myProps = this.props.route.params
     }
     console.log(this.type)
+
     this.onDataChange = this.onDataChange.bind(this)
+    this.onAddressChange = this.onAddressChange.bind(this)
+
   }
 
-  _calculateState() {
+  _calculateState(props) {
+    var shippingAddress = {}
+    var billingAddress = {}
+    var callbackUrl = 'https://returnurl.com'
+    if (props != null && props.route != null && props.route.params != null) {
+      shippingAddress = this.props.route.params.shippingAddress
+      billingAddress = this.props.route.params.billingAddress
+      callbackUrl = this.props.route.params.callbackUrl == '' ? 'https://returnurl.com' : this.props.route.params.callbackUrl
+    }
     return {
       loading: false,
       creditCardFormValid: false,
@@ -36,15 +47,35 @@ class CheckoutLogic extends Component {
       htmlBodyContent: '',
       orderId: null,
       threeDSecureId: null,
+      billingAddress: billingAddress,
+      shippingAddress: shippingAddress,
+      callbackUrl: callbackUrl,
     }
+  }
+
+  onPaymentSuccess(res) {
+    this.props.navigation.navigate({
+      name: this.myProps.previousScreen,
+      params: { successResponse: res, failureResponse: '' },
+      merge: true,
+    })
+  }
+  onPaymentFailure(res) {
+    this.props.navigation.navigate({
+      name: this.myProps.previousScreen,
+      params: { successResponse: '', failureResponse: res },
+      merge: true,
+    })
   }
 
   closeScreen() {
     this.props.navigation.pop(1)
   }
   _handlePaymentRequest() {
-    const { amount, currency, callbackUrl, publicKey, apiPassword, paymentOperation } =
+    const { amount, currency, publicKey, apiPassword, paymentOperation } =
       this.type === 'modal' ? this.props : this.myProps
+    
+    const { rememberMe, billingAddress, shippingAddress, callbackUrl } = this.state
     this.setState({ loading: true })
     this._initiateAuthentication(
       amount,
@@ -52,7 +83,9 @@ class CheckoutLogic extends Component {
       callbackUrl,
       returnUrl,
       publicKey,
-      apiPassword
+      apiPassword,
+      billingAddress, 
+      shippingAddress
     )
       .then((res) => {
         let initiateAuthenticationResponse =
@@ -66,7 +99,7 @@ class CheckoutLogic extends Component {
           initiateAuthenticationResponse.orderId,
           callbackUrl,
           returnUrl,
-          this.state.rememberMe,
+          rememberMe,
           publicKey,
           apiPassword,
           paymentOperation
@@ -80,6 +113,10 @@ class CheckoutLogic extends Component {
               //handle 3d secure
               let htmlBodyContent = response.html.replace(
                 'target="redirectTo3ds1Frame"',
+                'target="_top"'
+              )
+              htmlBodyContent = response.html.replace(
+                'target="challengeFrame"',
                 'target="_top"'
               )
               this.setState({
@@ -105,7 +142,9 @@ class CheckoutLogic extends Component {
     callbackUrl,
     returnUrl,
     publicKey,
-    apiPassword
+    apiPassword,
+    billingAddress, 
+    shippingAddress
   ) {
     let initiateAuthenticationRequestBody =
       new InitiateAuthenticationRequestBody(
@@ -116,6 +155,8 @@ class CheckoutLogic extends Component {
           callbackUrl: callbackUrl,
           returnUrl: returnUrl,
           cardOnFile: this.state.rememberMe,
+          billing: billingAddress,
+          shipping: shippingAddress,
         }
       )
     console.log(initiateAuthenticationRequestBody.paramsMap())
@@ -202,6 +243,17 @@ class CheckoutLogic extends Component {
     this.setState({ creditCardFormValid: form.valid })
     this.setState({ creditCardFormData: form.values })
   }
+
+  onAddressChange(key, isBilling, value) {
+    if(isBilling)
+    {
+      this.state.billingAddress[key] = value
+    }
+    else
+    {
+      this.state.shippingAddress[key] = value
+    }
+  }
   _closeThreeDSecureModal() {
     const { amount, currency, publicKey, apiPassword } =
       this.type === 'modal' ? this.props : this.myProps
@@ -225,6 +277,72 @@ class CheckoutLogic extends Component {
         .catch((err) => this.onPaymentFailure(err))
     }
   }
+
+  getTextColor()
+  {
+    const props = this.type === 'modal' ? this.props : this.myProps
+    const textColor = props.textColor ? props.textColor: '#fff'
+    if(this.type === 'modal')
+    {
+      return '#000';
+    }
+    return textColor
+  }
+  getBackgroundColor()
+  {
+    const props = this.type === 'modal' ? this.props : this.myProps
+    const backgroundColor = props.backgroundColor ? props.backgroundColor: '#2c2222'
+    return backgroundColor
+  }
+  getLanguage()
+  {
+    const props = this.type === 'modal' ? this.props : this.myProps
+    const lang = props.lang ? props.lang: 'English'
+    return lang
+  }
+  TitleStyle()
+  {
+    const language = this.getLanguage()
+    const textColor = this.getTextColor()
+    return {
+      fontSize: 16,
+      marginBottom: 10,
+      marginTop: 40,
+      fontWeight: 'bold',
+      color: textColor,
+      textAlign : language === 'English' ? 'left' : 'right',
+    }
+  }
+  TitleNoMarginStyle()
+  {
+    const textColor = this.getTextColor()
+    return {
+      fontSize: 14,
+      fontWeight: 'bold',
+      marginHorizontal: 10,
+      color: textColor,
+    }
+  }
+  PaymentTitleStyle() {
+    const textColor = this.getTextColor()
+    return  {
+      fontWeight: '500',
+      fontSize: 16,
+      color: textColor,
+    }
+  }
+  TextInputRowStyle() {
+    const textColor = this.getTextColor()
+    const backgroundColor = this.getBackgroundColor()
+    const language = this.getLanguage()
+    return  {
+      marginVertical: 10,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      highlightColor: textColor,
+      textAlign : language === 'English' ? 'left' : 'right',
+    }
+  }
   _renderThreeDSecure() {
     const { threeDSecureModalVisible, htmlBodyContent } = this.state
     return (
@@ -239,18 +357,13 @@ class CheckoutLogic extends Component {
 
   renderPaymentInfo() {
     const props = this.type === 'modal' ? this.props : this.myProps
-    const { description, title } = props
     return (
       <View style={styles.paymentSummary}>
         <Image
           style={styles.image}
           source={require('../assets/defaultLogo.png')}
         />
-        <Text style={styles.paymentTitle}>{title}</Text>
-        <Text style={styles.paymentDescription}>{description}</Text>
-        <Text style={styles.totalAmount}>
-          {formatCurrencyAmountLabel(props)}
-        </Text>
+        <Text style={this.PaymentTitleStyle()}>Powered by Geidea</Text>
       </View>
     )
   }
@@ -272,7 +385,7 @@ class CheckoutLogic extends Component {
             creditCardFormValid ? styles.payButton : styles.payButtonDisabled
           }
           buttonTextStyle={styles.payButtonText}
-          underlayColor="#127F6A"
+          underlayColor="#ff4d00"
           disabled={loading || !creditCardFormValid}
         />
       </Section>
@@ -280,16 +393,17 @@ class CheckoutLogic extends Component {
   }
 
   renderRememberMe() {
+    const lang = this.getLanguage()
     const toggleSwitch = () =>
       this.setState({ rememberMe: !this.state.rememberMe })
     const { rememberMe } = this.state
     return (
       <Section>
-        <View style={styles.checkboxContainer}>
-          <Text style={styles.checkboxText}>Remember my card</Text>
+        <View style={ lang == 'English' ? styles.checkboxContainer : styles.checkboxContainerAr}>
+          <Text style={this.TitleNoMarginStyle()}> {lang == 'English' ? 'Remember my card?' : 'حفظ الكارت؟'}</Text>
           <Switch
-            trackColor={{ false: '#767577', true: '#005500' }}
-            thumbColor={rememberMe ? '#00ff00' : '#f4f3f4'}
+            trackColor={{ false: '#767577', true: '#f4f3f4' }}
+            thumbColor={rememberMe ? '#ff4d00' : '#f4f3f4'}
             ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
             value={rememberMe}
@@ -332,8 +446,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   paymentSummary: {
+    flexDirection: 'row',
     alignItems: 'center',
+    textAlignVertical: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
     padding: 15,
   },
   inputContainer: {
@@ -354,15 +471,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  paymentTitle: {
-    marginTop: 15,
-    fontWeight: '500',
-    fontSize: 16,
-  },
   image: {
-    height: 50,
+    height: 40,
     borderRadius: 25,
-    width: 50,
+    width: 40,
   },
   tabContainer: {
     flexGrow: 1,
@@ -401,8 +513,8 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   payButton: {
-    backgroundColor: '#16A085',
-    borderColor: '#16A085',
+    backgroundColor: '#ff4d00',
+    borderColor: '#ff4d00',
   },
   payButtonDisabled: {
     backgroundColor: '#999',
@@ -427,6 +539,16 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  checkboxContainerAr: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
   },
   useTokenContainer: {
     flex: 1,
@@ -437,6 +559,16 @@ const styles = StyleSheet.create({
   tokenNotification: {
     flex: 1,
     flexDirection: 'row',
+  },
+  TextInput: {
+    margin: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 16,
+    marginBottom: 10,
+    marginTop: 20,
+    fontWeight: 'bold',
   },
 })
 

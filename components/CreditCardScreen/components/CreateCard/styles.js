@@ -22,7 +22,7 @@ export default StyleSheet.create({
     marginTop: 10,
   },
   textInput: {
-    marginTop: 20,
+    borderWidth: 1,
   },
   message: {
     fontSize: 20,

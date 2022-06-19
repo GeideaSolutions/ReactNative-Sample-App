@@ -10,6 +10,19 @@ export const validateCreditCard = (value) => {
   }
 };
 
+
+export const typeCreditCard = (value) => {
+  var creditCardType = require("credit-card-type");
+  var visaCards = creditCardType(value);
+  if(visaCards != null && visaCards.length > 0) {
+    return visaCards[0].type;
+  }
+  return "";
+  
+};
+
+
+
 export const defaultCreditCard = (value) => {
   let newValue = value.replace(/ /g, "");
   let quantity = newValue.length;
