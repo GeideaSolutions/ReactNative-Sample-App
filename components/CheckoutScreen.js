@@ -63,14 +63,14 @@ class CheckoutScreen extends CheckoutLogic {
         <Text style={this.TitleStyle()}>{isBilling ? "عنوان الدفع" : "عنوان الشحن"}</Text>
         {this.renderTextInputRow(
           'الدوله',
-          isBilling ? 'bCountry' : 'sCountry',
-          isBilling ? this.myProps.billingAddress.countryCode :  this.myProps.shippingAddress.countryCode,
+          '_countryCode',
+          isBilling ? this.state.billingAddress._countryCode :  this.state.shippingAddress._countryCode,
           isBilling
         )}
         {this.renderTextInputRow(
           'الشارع و رقم المنزل',
-          isBilling ? 'bStreet' : 'sStreet',
-          isBilling ? this.myProps.billingAddress.street :  this.myProps.shippingAddress.street,
+          '_street',
+          isBilling ? this.state.billingAddress._street :  this.state.shippingAddress._street,
           isBilling
         )}
         <View
@@ -95,10 +95,10 @@ class CheckoutScreen extends CheckoutLogic {
             dense={true}
             onChangeText={this.onAddressChange.bind(
               this,
-              'city',
+              '_city',
               isBilling
             )}
-            defaultValue={isBilling ? this.myProps.billingAddress.city :  this.myProps.shippingAddress.city}
+            defaultValue={isBilling ? this.state.billingAddress._city :  this.state.shippingAddress._city}
           />
           <TextInput
             label="الرقم البريدى"
@@ -115,10 +115,10 @@ class CheckoutScreen extends CheckoutLogic {
             dense={true}
             onChangeText={this.onAddressChange.bind(
               this,
-              'postCode',
+              '_postCode',
               isBilling
             )}
-            defaultValue={isBilling ? this.myProps.billingAddress.postCode :  this.myProps.shippingAddress.postCode}
+            defaultValue={isBilling ? this.state.billingAddress._postCode :  this.state.shippingAddress._postCode}
           />
         </View>
       </View>
@@ -132,14 +132,14 @@ class CheckoutScreen extends CheckoutLogic {
         <Text style={this.TitleStyle()}> {isBilling? 'Billing address' : 'Shipping address'} </Text>
         {this.renderTextInputRow(
           'Country Code',
-          isBilling ? 'bCountry' : 'sCountry',
-          isBilling ? this.myProps.billingAddress.countryCode :  this.myProps.shippingAddress.countryCode,
+          '_countryCode',
+          isBilling ? this.state.billingAddress._countryCode :  this.state.shippingAddress._countryCode,
           isBilling
         )}
         {this.renderTextInputRow(
           'Street name & number',
-          isBilling ? 'bStreet' : 'sStreet',
-          isBilling ? this.myProps.billingAddress.street :  this.myProps.shippingAddress.street,
+          '_street',
+          isBilling ? this.state.billingAddress._street :  this.state.shippingAddress._street,
           isBilling
         )}
         <View
@@ -164,10 +164,10 @@ class CheckoutScreen extends CheckoutLogic {
             dense={true}
             onChangeText={this.onAddressChange.bind(
               this,
-              'city',
+              '_city',
               isBilling
             )}
-            defaultValue={isBilling ? this.myProps.billingAddress.city :  this.myProps.shippingAddress.city}
+            defaultValue={isBilling ? this.state.billingAddress._city :  this.state.shippingAddress._city}
           />
           <TextInput
             label="Postal"
@@ -184,10 +184,10 @@ class CheckoutScreen extends CheckoutLogic {
             dense={true}
             onChangeText={this.onAddressChange.bind(
               this,
-              'postCode',
+              '_postCode',
               isBilling
             )}
-            defaultValue={isBilling ? this.myProps.billingAddress.postCode :  this.myProps.shippingAddress.postCode}
+            defaultValue={isBilling ? this.state.billingAddress._postCode :  this.state.shippingAddress._postCode}
           />
         </View>
       </View>

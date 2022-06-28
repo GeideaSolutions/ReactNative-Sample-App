@@ -6,6 +6,9 @@ class ThreeDSModal extends ThreeDS {
     super(props)
     this._handleCloseModal = this._handleCloseModal.bind(this)
     this.handle3DS = this.handle3DS.bind(this)
+    this.state = {
+      count: 0,
+    };
   }
 
   _handleCloseModal() {
@@ -16,9 +19,19 @@ class ThreeDSModal extends ThreeDS {
     const { onRequestClose } = this.props
     console.log('onLoadProgress')
     //your code goes here
-    console.log(nativeEvent.url)
+    console.log(nativeEvent)
+    if(nativeEvent.url.includes ('callback') && nativeEvent.progress === 1) {
+      this.state.count++
+      console.log(this.state.count)
+    }
     if (nativeEvent.url.startsWith(returnUrl)) {
       console.log('Close 3DS Modal')
+      this.state.count = 0
+      return onRequestClose()
+    }
+    if (nativeEvent.url.includes ('callback') && nativeEvent.progress === 1 && this.state.count > 2) {
+      console.log('Close 3DS Modal')
+      this.state.count = 0
       return onRequestClose()
     }
   }

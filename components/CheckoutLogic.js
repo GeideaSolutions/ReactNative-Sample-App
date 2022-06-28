@@ -11,7 +11,7 @@ import AuthenticationApiResponse from '../response/AuthenticationApiResponse'
 import OrderResponse from '../response/OrderApiResponse'
 import { formatCurrencyAmountLabel } from '../utils'
 import ThreeDSScreenModal from './ThreeDSModal'
-
+import Address from 'react_geideapay/models/adress';
 let returnUrl = 'https://returnurl.com';
 class CheckoutLogic extends Component {
   constructor(props) {
@@ -22,7 +22,7 @@ class CheckoutLogic extends Component {
       this.type = 'screen'
       this.myProps = this.props.route.params
     }
-    console.log(this.type)
+    console.log(this.type, this.state)
 
     this.onDataChange = this.onDataChange.bind(this)
     this.onAddressChange = this.onAddressChange.bind(this)
@@ -30,8 +30,14 @@ class CheckoutLogic extends Component {
   }
 
   _calculateState(props) {
-    var shippingAddress = {}
-    var billingAddress = {}
+    var shippingAddress
+    var billingAddress
+    if (props != null && props.shippingAddress != null) {
+      shippingAddress = props.shippingAddress
+    }
+    if (props != null && props.billingAddress != null) {
+      billingAddress = props.billingAddress
+    }
     var callbackUrl = 'https://returnurl.com'
     if (props != null && props.route != null && props.route.params != null) {
       shippingAddress = this.props.route.params.shippingAddress
@@ -74,8 +80,8 @@ class CheckoutLogic extends Component {
   _handlePaymentRequest() {
     const { amount, currency, publicKey, apiPassword, paymentOperation } =
       this.type === 'modal' ? this.props : this.myProps
-    
-    const { rememberMe, billingAddress, shippingAddress, callbackUrl } = this.state
+    const { rememberMe, callbackUrl,  billingAddress, shippingAddress } = this.state
+    console.log(this.state)
     this.setState({ loading: true })
     this._initiateAuthentication(
       amount,
@@ -115,7 +121,7 @@ class CheckoutLogic extends Component {
                 'target="redirectTo3ds1Frame"',
                 'target="_top"'
               )
-              htmlBodyContent = response.html.replace(
+              htmlBodyContent = htmlBodyContent.replace(
                 'target="challengeFrame"',
                 'target="_top"'
               )
@@ -143,9 +149,24 @@ class CheckoutLogic extends Component {
     returnUrl,
     publicKey,
     apiPassword,
-    billingAddress, 
-    shippingAddress
+    billingAddressProp, 
+    shippingAddressProp
   ) {
+
+    let billingAddress = new Address({
+      countryCode: billingAddressProp._countryCode,
+      street: billingAddressProp._street,
+      city: billingAddressProp._city,
+      postCode: billingAddressProp._postCode,
+    });
+
+    let shippingAddress = new Address({
+      countryCode: shippingAddressProp._countryCode,
+      street: shippingAddressProp._street,
+      city: shippingAddressProp._city,
+      postCode: shippingAddressProp._postCode,
+    });
+
     let initiateAuthenticationRequestBody =
       new InitiateAuthenticationRequestBody(
         amount,
@@ -345,6 +366,7 @@ class CheckoutLogic extends Component {
   }
   _renderThreeDSecure() {
     const { threeDSecureModalVisible, htmlBodyContent } = this.state
+    console.log(htmlBodyContent)
     return (
       <ThreeDSScreenModal
         visible={threeDSecureModalVisible}
