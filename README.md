@@ -28,7 +28,7 @@ Please install the prerequisites first, then you can either integrate the plugin
     npm install --save react-native-webview react-native-vector-icons
     react-native link react-native-webview
     react-native link react-native-vector-icons
-    npm install GeideaSolutions/ReactSDK#main
+    npm install GeideaSolutions/react_geideapay#main
 ```
 
 
