@@ -169,6 +169,7 @@ class HomeScreen extends Component {
       merchantReferenceID: await AsyncStorage.getItem('merchantReferenceID'),
       lang: lang,
       sameAddress: sameAddress,
+      selectedEnvironment: await AsyncStorage.getItem('selectedEnvironment'),
     });
   };
 

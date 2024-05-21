@@ -17,6 +17,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Address from 'react_geideapay/models/adress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import GeideaApi from 'react_geideapay/actions/GeideaApi';
 
 const paymentOperations = [
   'Default (merchant configuration)',
@@ -25,7 +26,9 @@ const paymentOperations = [
   'AuthorizeCapture',
 ];
 const initiatedByOptions = ['Internet', 'Merchant'];
-const agreementTypes = ['None', 'Recurring', 'Installment', 'Unscheduled'];
+const agreementTypes = ['None', 'Recurring', 'Installment', 'Unscheduled']
+
+const environments = GeideaApi.getEnvironments();
 
 const langOptions = [
   {
@@ -84,6 +87,8 @@ class HomeScreen extends Component {
       lang: 'English',
       billingAddress: new Address(),
       shippingAddress: new Address(),
+      selectedEnvironment: 'Egypt - Production',
+      selectedEnvironmentIndex:0,
     };
 
     this.closePaymentModal = this.closePaymentModal.bind(this);
@@ -151,6 +156,21 @@ class HomeScreen extends Component {
       const returnUrl = await AsyncStorage.getItem('returnUrl');
       const code = await AsyncStorage.getItem('code');
 
+      const selectedEnvironment = await AsyncStorage.getItem('selectedEnvironment');
+      let selectedEnvironmentIndex;
+      try {
+        const stringValue = await AsyncStorage.getItem('selectedEnvironmentIndex'); // Retrieve the stored value
+        if (stringValue !== null) {
+          selectedEnvironmentIndex = parseInt(stringValue); // Parse the retrieved string value to an integer
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.log('Error reading integer:', error);
+        return null;
+      }
+
+
       // Convert string values to their appropriate types
       const showEmail = showEmailString === 'true';
       const showBilling = showBillingString === 'true';
@@ -181,6 +201,8 @@ class HomeScreen extends Component {
         callbackUrl: callbackUrl || '',
         returnUrl: returnUrl || '',
         code: code || '+',
+        selectedEnvironment: selectedEnvironment,
+        selectedEnvironmentIndex: selectedEnvironmentIndex,
       });
     } catch (error) {
       console.log('Error retrieving values:', error);
@@ -481,7 +503,8 @@ class HomeScreen extends Component {
       const showReceiptString = this.state.showReceipt.toString();
       const showPhoneString = this.state.showPhone.toString();
       const sameAddressString = this.state.sameAddress.toString();
-
+      await AsyncStorage.setItem('selectedEnvironment', this.state.selectedEnvironment);
+      await AsyncStorage.setItem('selectedEnvironmentIndex',this.state.selectedEnvironmentIndex.toString());
       await AsyncStorage.setItem('currency', this.state.currency);
       await AsyncStorage.setItem('showEmail', showEmailString);
       await AsyncStorage.setItem(
@@ -687,6 +710,11 @@ class HomeScreen extends Component {
     );
   }
 
+  getSelectedEnvironmentIndex(){
+    const {selectedEnvironmentIndex} = this.state;
+    return selectedEnvironmentIndex;
+  }
+
   render() {
     const {publicKey, apiPassword, isProdSelected, isTestSelected} = this.state;
 
@@ -694,35 +722,41 @@ class HomeScreen extends Component {
       <View style={styles.container}>
         <StatusBar backgroundColor="red" barStyle="light-content" />
         <ScrollView style={{margin: 20}}>
-          <Text style={styles.title}>Environment</Text>
-          <View style={styles.row1}>
-            <View
-              style={[
-                styles.buttonWrapper1,
-                isProdSelected
-                  ? styles.selectedButtonWrapper1
-                  : styles.unselectedButtonWrapper1,
-              ]}>
-              <Button
-                title="Prod"
-                onPress={this.onProdPress}
-                color={isProdSelected ? '#ff4500' : '#808080'}
+        <View style={styles.pickercontainer}>
+        <Text style={styles.title}>Environment</Text>
+        <SelectDropdown
+          data={environments}
+          onSelect={(selectedItem, index) => {
+              this.setState({selectedEnvironment: selectedItem});
+              this.setState({selectedEnvironmentIndex: index});
+          }}
+          defaultButtonText={environments[this.getSelectedEnvironmentIndex()]}
+          defaultIndex={this.getSelectedEnvironmentIndex()}
+          buttonStyle={styles.dropdown1BtnStyle}
+          buttonTextStyle={styles.dropdown1BtnTxtStyle}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            // text displayed after item is selected
+            return selectedItem;
+          }}
+          rowTextForSelection={(item) => {
+            // Display the item's label in the dropdown
+            return item;
+          }}
+          renderDropdownIcon={isOpened => {
+            return (
+              <FontAwesome
+                name={isOpened ? 'chevron-up' : 'chevron-down'}
+                color={'#444'}
+                size={18}
               />
-            </View>
-            <View
-              style={[
-                styles.buttonWrapper1,
-                isTestSelected
-                  ? styles.selectedButtonWrapper1
-                  : styles.unselectedButtonWrapper1,
-              ]}>
-              <Button
-                title="Test"
-                onPress={this.onTestPress}
-                color={isTestSelected ? '#ff4500' : '#808080'}
-              />
-            </View>
-          </View>
+            );
+          }}
+          dropdownIconPosition={'right'}
+          dropdownStyle={styles.dropdown1DropdownStyle}
+          rowStyle={styles.dropdown1RowStyle}
+          rowTextStyle={styles.dropdown1RowTxtStyle}
+        />
+      </View>
 
           {isProdSelected || isTestSelected ? (
             <View
@@ -815,11 +849,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  pickercontainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  dropdown: {
+    height: 50,
+    width: 200,
+    marginBottom: 20,
+  },
+  selectedItem: {
+    fontSize: 16,
+    marginTop: 20,
+  },
   cont: {
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 10,
-    marginTop: 0,
+    marginTop: 15,
   },
   selectedContainer: {
     borderTopColor: '#ff4500',
