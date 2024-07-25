@@ -50,6 +50,7 @@ class HomeScreen extends Component {
     this.state = {
       publicKey: '',
       apiPassword: '',
+      token: '',
       isProdSelected: true,
       isTestSelected: false,
       isLoading: false,
@@ -71,7 +72,7 @@ class HomeScreen extends Component {
       sameAddress: true,
       //payment details
       paymentOperation: paymentOperations[0],
-      initiatedBy: initiatedByOptions[0],
+      initiatedBy: '',
       agreementType: agreementTypes[0],
       paymentIntentID: '',
       hideLogo: false,
@@ -134,6 +135,7 @@ class HomeScreen extends Component {
       // Retrieve values from AsyncStorage
       const publicKey = await AsyncStorage.getItem('publicKey');
       const apiPassword = await AsyncStorage.getItem('apiPassword');
+      const token = await AsyncStorage.getItem('token');
       const currency = await AsyncStorage.getItem('currency');
       const showEmailString = await AsyncStorage.getItem('showEmail');
       const billingAddressString = await AsyncStorage.getItem('billingAddress');
@@ -170,6 +172,7 @@ class HomeScreen extends Component {
         return null;
       }
 
+      const initiatedBy = await AsyncStorage.getItem('initiatedBy');
 
       // Convert string values to their appropriate types
       const showEmail = showEmailString === 'true';
@@ -184,8 +187,10 @@ class HomeScreen extends Component {
       this.setState({
         publicKey: publicKey || '',
         apiPassword: apiPassword || '',
+        token: token || '',
         currency: currency || '',
         showEmail: showEmail || false,
+        initiatedBy: initiatedBy || '',
         billingAddress: JSON.parse(billingAddressString) || new Address(),
         shippingAddress: JSON.parse(shippingAddressString) || new Address(),
         showBilling: showBilling || false,
@@ -224,14 +229,14 @@ class HomeScreen extends Component {
   }
 
   onSavePress = async () => {
-    this.setState({
-      publicKey: this.state.publicKey,
-      apiPassword: this.state.apiPassword,
-    });
     try {
       await AsyncStorage.setItem('publicKey', this.state.publicKey);
       await AsyncStorage.setItem('apiPassword', this.state.apiPassword);
+      await AsyncStorage.setItem('token', this.state.token);
+
+      console.log(`values saved here are ${this.state.publicKey} - ${this.state.apiPassword}`);
       Alert.alert('Values saved successfully');
+
     } catch (error) {
       console.log('Error saving values:', error);
       Alert.alert('An error occurred while saving values');
@@ -242,6 +247,7 @@ class HomeScreen extends Component {
     this.setState({
       publicKey: '',
       apiPassword: '',
+      token: '',
     });
   }
 
@@ -421,8 +427,8 @@ class HomeScreen extends Component {
           'Street Name & Number',
           '_street',
           isBilling
-            ? this.state.billingAddress._street
-            : this.state.shippingAddress._street,
+            ? this.state.billingAddress.street
+            : this.state.shippingAddress.street,
           isBilling,
         )}
         {this.renderAddressTextInputRow(
@@ -531,6 +537,8 @@ class HomeScreen extends Component {
       await AsyncStorage.setItem('callbackUrl', this.state.callbackUrl);
       await AsyncStorage.setItem('returnUrl', this.state.returnUrl);
       await AsyncStorage.setItem('code', this.state.code);
+      await AsyncStorage.setItem('initiatedBy', this.state.initiatedBy);
+      await AsyncStorage.setItem('merchantReferenceID', this.state.merchantReferenceID);
 
       Alert.alert('Values saved successfully');
       
@@ -620,7 +628,7 @@ class HomeScreen extends Component {
   renderDropDown(varName, options) {
     let placeholderText = '';
     if (varName === 'initiatedBy') {
-      placeholderText = 'Initiated By';
+      placeholderText = this.state.initiatedBy === '' ? 'Initiated By' : this.state.initiatedBy;
     } else {
       placeholderText = options[0];
     }
@@ -716,7 +724,7 @@ class HomeScreen extends Component {
   }
 
   render() {
-    const {publicKey, apiPassword, isProdSelected, isTestSelected} = this.state;
+    const {publicKey, apiPassword, isProdSelected, isTestSelected, token} = this.state;
 
     return (
       <View style={styles.container}>
@@ -771,7 +779,10 @@ class HomeScreen extends Component {
                 style={styles.TextInput1}
                 value={publicKey}
                 onChangeText={text => {
-                  this.setState({publicKey: text});
+                  this.setState(prevState => ({
+                    ...prevState,
+                    publicKey: text
+                }));
                 }}
               />
               <TextInput
@@ -780,7 +791,20 @@ class HomeScreen extends Component {
                 label="Api Password"
                 value={apiPassword}
                 onChangeText={text => {
-                  this.setState({apiPassword: text});
+                  this.setState(prevState => ({
+                    ...prevState,
+                    apiPassword: text
+                }));
+                }}
+              />
+
+              <TextInput
+                style={styles.TextInput1}
+                mode="outlined"
+                label="Token"
+                value={token}
+                onChangeText={text => {
+                  this.setState({token: text});
                 }}
               />
 

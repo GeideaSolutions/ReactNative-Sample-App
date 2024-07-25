@@ -17,9 +17,11 @@ import {TouchableOpacity} from 'react-native';
 import PaymentDetails from 'react_geideapay/components/PaymentDetails';
 import ThreeDSScreen from 'react_geideapay/components/ThreeDSScreen.js';
 import CheckoutScreen from 'react_geideapay/components/CheckoutScreen';
+import CheckoutWithTokenScreen from 'react_geideapay/components/CheckoutWithTokenScreen';
 import PaymentComponent from 'react_geideapay/components/PaymentComponent';
 import PaymentRefund from 'react_geideapay/components/PaymentRefund';
 import PaymentFailure from 'react_geideapay/components/PaymentFailure';
+import PaymentWebViewScreen from 'react_geideapay/components/PaymentWebViewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +45,17 @@ const App = () => {
           component={PaymentComponent}
           options={{
             title: 'Card Payment',
+            headerStyle: {
+              backgroundColor: '#ff4500',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen
+          name="WebPayment"
+          component={PaymentWebViewScreen}
+          options={{
+            title: 'Payment Gateway',
             headerStyle: {
               backgroundColor: '#ff4500',
             },
@@ -101,6 +114,52 @@ const App = () => {
         <Stack.Screen
           name="CheckoutScreen"
           component={CheckoutScreen}
+          options={({route, navigation}) => {
+            return {
+              title: route.params.screenTitle,
+              headerStyle: {
+                backgroundColor: '#ff4500',
+              },
+              headerTintColor: '#fff',
+              headerLeft: () => (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('PaymentComponent', {
+                      publicKey: route.params?.publicKey,
+                      apiPassword: route.params?.apiPassword,
+                      currency: route.params?.currency,
+                      code: route.params?.code,
+                      callbackUrl: route.params?.callbackUrl,
+                      showEmail: route.params?.showEmail,
+                      billingAddress: route.params?.billingAddress,
+                      shippingAddress: route.params?.shippingAddress,
+                      showBilling: route.params?.showBilling,
+                      showSaveCard: route.params?.showSaveCard,
+                      hideLogo: route.params?.hideLogo,
+                      showReceipt: route.params?.showReceipt,
+                      customerEmail: route.params?.customerEmail,
+                      phoneNumber: route.params?.phoneNumber,
+                      headerColor: route.params?.headerColor,
+                      showPhone: route.params?.showPhone,
+                      merchantReferenceID: route.params?.merchantReferenceID,
+                      lang: route.params?.lang,
+                      sameAddress: route.params?.sameAddress,
+                    });
+                  }}>
+                  <Icon
+                    name="arrow-back"
+                    size={27}
+                    color="#fff"
+                    style={styles.backArrow}
+                  />
+                </TouchableOpacity>
+              ),
+            };
+          }}
+        />
+         <Stack.Screen
+          name="CheckoutWithTokenScreen"
+          component={CheckoutWithTokenScreen}
           options={({route, navigation}) => {
             return {
               title: route.params.screenTitle,

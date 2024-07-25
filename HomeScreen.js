@@ -148,17 +148,19 @@ class HomeScreen extends Component {
 
     navigation.push('PaymentComponent', {
       navigateToPaymentModal: true,
+      token: await AsyncStorage.getItem('token'),
       publicKey: await AsyncStorage.getItem('publicKey'),
       apiPassword: await AsyncStorage.getItem('apiPassword'),
       currency: await AsyncStorage.getItem('currency'),
       code: await AsyncStorage.getItem('code'),
       callbackUrl: await AsyncStorage.getItem('callbackUrl'),
-      returnUrl:await AsyncStorage.getItem('returnUrl'),
+      returnUrl: await AsyncStorage.getItem('returnUrl'),
       showEmail: showEmail,
       billingAddress: JSON.parse(await AsyncStorage.getItem('billingAddress')),
       shippingAddress: JSON.parse(
         await AsyncStorage.getItem('shippingAddress'),
       ),
+      initiatedBy: await AsyncStorage.getItem('initiatedBy'),
       showBilling: showBilling,
       hideLogo: hideLogo,
       showReceipt: showReceipt,
