@@ -26,6 +26,13 @@ import PaymentWebViewScreen from 'react_geideapay/components/PaymentWebViewScree
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  if (!__DEV__) {
+    console.log = () => {};
+    console.info = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+    console.debug = () => {};
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -130,6 +137,7 @@ const App = () => {
                       currency: route.params?.currency,
                       code: route.params?.code,
                       callbackUrl: route.params?.callbackUrl,
+                      returnUrl: route.params?.returnUrl,
                       showEmail: route.params?.showEmail,
                       billingAddress: route.params?.billingAddress,
                       shippingAddress: route.params?.shippingAddress,
@@ -176,6 +184,7 @@ const App = () => {
                       currency: route.params?.currency,
                       code: route.params?.code,
                       callbackUrl: route.params?.callbackUrl,
+                      returnUrl: route.params?.returnUrl,
                       showEmail: route.params?.showEmail,
                       billingAddress: route.params?.billingAddress,
                       shippingAddress: route.params?.shippingAddress,

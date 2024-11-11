@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Address from 'react_geideapay/models/adress';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -40,8 +41,8 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    this.setDefaultState();
-    this.clearAsyncStorageValues();
+    // this.setDefaultState();
+    // this.clearAsyncStorageValues();
     BackHandler.addEventListener(
       'hardwareBackPress',
       this.handleBackButtonPress,
@@ -148,9 +149,9 @@ class HomeScreen extends Component {
 
     navigation.push('PaymentComponent', {
       navigateToPaymentModal: true,
-      token: await AsyncStorage.getItem('token'),
-      publicKey: await AsyncStorage.getItem('publicKey'),
-      apiPassword: await AsyncStorage.getItem('apiPassword'),
+      token: await EncryptedStorage.getItem('token'),
+      publicKey: await EncryptedStorage.getItem('publicKey'),
+      apiPassword: await EncryptedStorage.getItem('apiPassword'),
       currency: await AsyncStorage.getItem('currency'),
       code: await AsyncStorage.getItem('code'),
       callbackUrl: await AsyncStorage.getItem('callbackUrl'),

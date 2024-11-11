@@ -18,6 +18,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Address from 'react_geideapay/models/adress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GeideaApi from 'react_geideapay/actions/GeideaApi';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const paymentOperations = [
   'Default (merchant configuration)',
@@ -133,9 +134,9 @@ class HomeScreen extends Component {
     this.setState({orderId: null});
     try {
       // Retrieve values from AsyncStorage
-      const publicKey = await AsyncStorage.getItem('publicKey');
-      const apiPassword = await AsyncStorage.getItem('apiPassword');
-      const token = await AsyncStorage.getItem('token');
+      const publicKey = await EncryptedStorage.getItem('publicKey');
+      const apiPassword = await EncryptedStorage.getItem('apiPassword');
+      const token = await EncryptedStorage.getItem('token');
       const currency = await AsyncStorage.getItem('currency');
       const showEmailString = await AsyncStorage.getItem('showEmail');
       const billingAddressString = await AsyncStorage.getItem('billingAddress');
@@ -230,9 +231,9 @@ class HomeScreen extends Component {
 
   onSavePress = async () => {
     try {
-      await AsyncStorage.setItem('publicKey', this.state.publicKey);
-      await AsyncStorage.setItem('apiPassword', this.state.apiPassword);
-      await AsyncStorage.setItem('token', this.state.token);
+      await EncryptedStorage.setItem('publicKey', this.state.publicKey);
+      await EncryptedStorage.setItem('apiPassword', this.state.apiPassword);
+      await EncryptedStorage.setItem('token', this.state.token);
 
       console.log(`values saved here are ${this.state.publicKey} - ${this.state.apiPassword}`);
       Alert.alert('Values saved successfully');
@@ -327,8 +328,13 @@ class HomeScreen extends Component {
         mode="outlined"
         dense={true}
         key={varName}
+        autoCapitalize='none'
         onChangeText={text => {
-          this.handlePaymentDetails(varName, text);
+          if(varName === 'callbackUrl' || varName === 'returnUrl'){
+            this.handlePaymentDetails(varName, text.toLowerCase());
+          }else{
+            this.handlePaymentDetails(varName, text);
+          }
         }}
         onBlur={this.validateInput.bind(this, varName)}
         value={defaultValue}
@@ -427,16 +433,16 @@ class HomeScreen extends Component {
           'Street Name & Number',
           '_street',
           isBilling
-            ? this.state.billingAddress.street
-            : this.state.shippingAddress.street,
+            ? this.state.billingAddress.street?.toString()
+            : this.state.shippingAddress.street?.toString(),
           isBilling,
         )}
         {this.renderAddressTextInputRow(
           'Country Code',
           '_countryCode',
           isBilling
-            ? this.state.billingAddress._countryCode
-            : this.state.shippingAddress._countryCode,
+            ? this.state.billingAddress._countryCode?.toString()
+            : this.state.shippingAddress._countryCode?.toString(),
           isBilling,
         )}
         <View

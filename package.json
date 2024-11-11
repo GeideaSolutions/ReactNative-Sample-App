@@ -23,6 +23,7 @@
     "react-native": "0.68.0",
     "react-native-base64": "^0.2.1",
     "react-native-credit-card-input": "^0.4.1",
+    "react-native-encrypted-storage": "^4.0.3",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-paper": "^4.12.1",
     "react-native-radio-buttons-group": "^2.2.11",
