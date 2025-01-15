@@ -35,7 +35,7 @@
     "react-native-vector-icons": "^9.1.0",
     "react-native-web": "^0.19.5",
     "react-native-webview": "^11.18.1",
-    "react_geideapay": "git+https://github.com/payorch/react_geideapay_sdk.git#v6_api_changes",
+    "react_geideapay": "git+https://github.com/GeideaSolutions/react_geideapay",
     "universal-storage": "^0.0.23",
     "utf8": "^3.0.0"
   },
